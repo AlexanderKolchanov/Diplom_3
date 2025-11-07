@@ -9,8 +9,8 @@ class MainPage(BasePage):
     def click_on_personal_account_in_header(self):
         """Клик по кнопке личного кабинета в верхней панели навигации"""
         self.click_on_element(MainPageLocators.BUTTON_PERSONAL_ACCOUNT)
-        
 
+        
     @allure.step('Кликнуть по кнопке "Лента заказов" в хэдере')
     def click_header_feed_button(self):
         """Клик по кнопке перехода в ленту заказов в хедере"""
@@ -45,7 +45,6 @@ class MainPage(BasePage):
     def check_displaying_of_modal_details(self):
         """Проверка отображения модального окна с деталями ингредиента"""
         return self.check_displaying_of_element(MainPageLocators.MODAL_OF_INGREDIENT)
-    
     
     
     @allure.step('Проверить, что окно "Детали ингредиента" не отображается')
@@ -122,3 +121,28 @@ class MainPage(BasePage):
         self.send_keys_to_input(AccountPageLocators.INPUT_PASSWORD, password)
         self.click_on_element(AccountPageLocators.BUTTON_LOGIN)
         self.wait_visibility_of_element(MainPageLocators.BUTTON_MAKE_ORDER, timeout=15)
+
+
+    # НОВЫЕ МЕТОДЫ ДЛЯ ИСПРАВЛЕНИЯ ТЕСТОВ
+    @allure.step('Дождаться обработки заказа')
+    def wait_for_order_processing(self, timeout=30):
+        """Ожидание завершения обработки заказа и появления номера"""
+        self.wait_visibility_of_element(MainPageLocators.ORDER_NUMBER_CONFIRM, timeout)
+
+
+    @allure.step('Проверить отображение ингредиента')
+    def check_ingredient_displayed(self):
+        """Проверка отображения ингредиента"""
+        return self.check_displaying_of_element(MainPageLocators.BURGER_INGREDIENT)
+    
+
+    @allure.step('Проверить отображение корзины для ингредиентов')
+    def check_basket_displayed(self):
+        """Проверка отображения корзины для ингредиентов"""
+        return self.check_displaying_of_element(MainPageLocators.BASKET_FOR_INGREDIENTS)
+    
+
+    @allure.step('Проверить отображение кнопки конструктора')
+    def check_constructor_button_displayed(self):
+        """Проверка отображения кнопки конструктора"""
+        return self.check_displaying_of_element(MainPageLocators.BUTTON_CONSTRUCTOR)

@@ -1,6 +1,5 @@
 from page_objects.feed_page import FeedPage
 from page_objects.main_page import MainPage
-from locators.main_page_locators import MainPageLocators
 from conftest import *
 import allure
 
@@ -34,7 +33,7 @@ class TestFeedPage:
         main_page.click_on_button_make_order()
         
         # Ожидаем обработки заказа и появления номера в модальном окне
-        main_page.wait_visibility_of_element(MainPageLocators.ORDER_NUMBER_CONFIRM, timeout=30)
+        main_page.wait_for_order_processing(timeout=30)
         main_page.click_on_button_close_confirmation_modal()
         
         # Проверяем обновленное значение счетчика заказов
@@ -46,7 +45,6 @@ class TestFeedPage:
         count_2 = int(orders_count_2)
         # Счетчик должен увеличиться после создания заказа
         assert count_2 > count_1, f"Счетчик не увеличился: было {count_1}, стало {count_2}"
-
 
     @allure.title('Проверка увеличения числа на счетчике выполненных за Сегодня заказов')
     @allure.description('''
@@ -75,7 +73,7 @@ class TestFeedPage:
         main_page.click_on_button_make_order()
         
         # Ожидаем завершения обработки заказа
-        main_page.wait_visibility_of_element(MainPageLocators.ORDER_NUMBER_CONFIRM, timeout=30)
+        main_page.wait_for_order_processing(timeout=30)
         main_page.click_on_button_close_confirmation_modal()
         
         # Проверяем обновленное значение дневного счетчика
@@ -88,7 +86,6 @@ class TestFeedPage:
         # Счетчик должен увеличиться после создания заказа
         assert count_2 > count_1, f"Счетчик не увеличился: было {count_1}, стало {count_2}"
         
-
     @allure.title('Проверка появления нового заказа в разделе "В работе"')
     @allure.description('''
     Проверка отображения нового заказа в ленте заказов:
@@ -110,7 +107,10 @@ class TestFeedPage:
         # Создаем заказ и получаем его номер для проверки
         main_page.drag_and_drop_ingredient_to_order()
         main_page.click_on_button_make_order()
-        new_order_id = main_page.get_number_of_order_in_modal_confirmation()
+        
+        # Ожидаем обработки заказа
+        main_page.wait_for_order_processing(timeout=30)
+        main_page.get_number_of_order_in_modal_confirmation()
         main_page.click_on_button_close_confirmation_modal()
         
         # Переходим в ленту заказов для проверки отображения
