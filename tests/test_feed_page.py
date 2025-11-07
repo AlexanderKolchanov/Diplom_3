@@ -41,14 +41,11 @@ class TestFeedPage:
         main_page.click_header_feed_button()
         orders_count_2 = feed_page.get_quantity_of_orders()
         
-        # Сравниваем значения счетчиков до и после создания заказа
-        try:
-            count_1 = int(orders_count_1)
-            count_2 = int(orders_count_2)
-            assert count_2 >= count_1  # Счетчик должен увеличиться или остаться прежним
-        except ValueError:
-            # Если значения не числовые, проверяем что они изменились
-            assert orders_count_2 != orders_count_1
+        # Преобразуем значения в числа и сравниваем
+        count_1 = int(orders_count_1)
+        count_2 = int(orders_count_2)
+        # Счетчик должен увеличиться после создания заказа
+        assert count_2 > count_1, f"Счетчик не увеличился: было {count_1}, стало {count_2}"
 
 
     @allure.title('Проверка увеличения числа на счетчике выполненных за Сегодня заказов')
@@ -85,15 +82,12 @@ class TestFeedPage:
         main_page.click_header_feed_button()
         orders_count_2 = feed_page.get_daily_quantity_of_orders()
         
-        # Сравниваем значения дневных счетчиков
-        try:
-            count_1 = int(orders_count_1)
-            count_2 = int(orders_count_2)
-            assert count_2 >= count_1  # Дневной счетчик должен увеличиться
-        except ValueError:
-            # Альтернативная проверка для нечисловых значений
-            assert orders_count_2 != orders_count_1
-            
+        # Преобразуем значения в числа и сравниваем
+        count_1 = int(orders_count_1)
+        count_2 = int(orders_count_2)
+        # Счетчик должен увеличиться после создания заказа
+        assert count_2 > count_1, f"Счетчик не увеличился: было {count_1}, стало {count_2}"
+        
 
     @allure.title('Проверка появления нового заказа в разделе "В работе"')
     @allure.description('''
