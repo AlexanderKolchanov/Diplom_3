@@ -11,6 +11,18 @@ class BasePage:
         self.driver = driver
 
 
+    @allure.step('Выполнить JavaScript код')
+    def execute_javascript(self, script, *args):
+        """Выполнение JavaScript кода на странице"""
+        return self.driver.execute_script(script, *args)
+    
+
+    @allure.step('Создать ActionChains')
+    def create_action_chains(self):
+        """Создание цепочки действий для сложных взаимодействий"""
+        return ActionChains(self.driver)
+        
+
     @allure.step('Подождать прогрузки элемента')
     def wait_visibility_of_element(self, locator, timeout=20):
         """Ожидание видимости элемента на странице с заданным таймаутом"""
@@ -18,7 +30,7 @@ class BasePage:
             EC.visibility_of_element_located(locator)
         )
     
-
+    
     @allure.step('Кликнуть на элемент с обработкой исключений')
     def click_on_element(self, locator):
         """Клик по элементу с обработкой случаев когда элемент перекрыт"""
@@ -28,7 +40,7 @@ class BasePage:
         except ElementClickInterceptedException:
             # Если элемент перекрыт, пробуем кликнуть через JavaScript
             element = self.find_element_with_wait(locator)
-            self.driver.execute_script("arguments[0].click();", element)
+            self.execute_javascript("arguments[0].click();", element)
 
 
     @allure.step('Найти элемент на странице')
@@ -36,7 +48,7 @@ class BasePage:
         """Поиск элемента с ожиданием его появления на странице"""
         return self.wait_visibility_of_element(locator, timeout)
     
-
+    
     @allure.step('Ввести значение в поле ввода')
     def send_keys_to_input(self, locator, keys):
         """Ввод текста в поле ввода с предварительной очисткой"""
@@ -67,7 +79,7 @@ class BasePage:
         element = self.find_element_with_wait(locator)
         return element.text
     
-
+    
     @allure.step('Проверить отображение элемента')
     def check_displaying_of_element(self, locator, timeout=10):
         """Проверка отображения элемента на странице"""
@@ -79,6 +91,16 @@ class BasePage:
         except:
             return False
         
+        
+    @allure.step('Проверить, что элемент не отображается')
+    def check_not_displaying_of_element(self, locator, timeout=10):
+        """Проверка что элемент не отображается на странице"""
+        try:
+            self.wait_for_closing_of_element(locator, timeout)
+            return True
+        except:
+            return False
+        
 
     @allure.step('Подождать, пока элемент закроется')
     def wait_for_closing_of_element(self, locator, timeout=20):
@@ -87,7 +109,7 @@ class BasePage:
             EC.invisibility_of_element_located(locator)
         )
     
-
+    
     @allure.step('Проверить кликабельность элемента')
     def check_element_is_clickable(self, locator, timeout=20):
         """Проверка что элемент кликабелен и готов к взаимодействию"""
@@ -95,7 +117,7 @@ class BasePage:
             EC.element_to_be_clickable(locator)
         )
     
-
+    
     @allure.step('Подождать смены текста на элементе')
     def wait_for_element_to_change_text(self, locator, old_text, timeout=30):
         """Ожидание изменения текста элемента с заданного значения"""
@@ -103,19 +125,36 @@ class BasePage:
             EC.text_to_be_present_in_element(locator, old_text)
         )
     
-
+    
     @allure.step('Ждать обновления UI')
     def wait_for_ui_update(self, timeout=5):
         """Ожидание завершения обновления интерфейса после действий"""
         WebDriverWait(self.driver, timeout).until(
             lambda driver: driver.execute_script("return document.readyState") == "complete"
         )
-        
 
+        
     @allure.step('Ждать пока элемент получит валидный текст')
     def wait_for_element_to_have_valid_text(self, locator, timeout=30):
-        """Ожидание появления валидного непустого текста в элементе"""
+        """Ожидание появления валидного текста в элементе"""
         return WebDriverWait(self.driver, timeout).until(
             lambda driver: driver.find_element(*locator).text and 
                           driver.find_element(*locator).text.strip() and 
                           not driver.find_element(*locator).text.isspace())
+    
+    
+    @allure.step('Выполнить JavaScript drag-and-drop')
+    def execute_javascript_drag_and_drop(self, source_element, target_element):
+        """Выполнение drag-and-drop через JavaScript"""
+        self.execute_javascript("""
+            var source = arguments[0];
+            var target = arguments[1];
+            
+            var dragStart = new Event('dragstart', { bubbles: true });
+            var dragOver = new Event('dragover', { bubbles: true });
+            var drop = new Event('drop', { bubbles: true });
+            
+            source.dispatchEvent(dragStart);
+            target.dispatchEvent(dragOver);
+            target.dispatchEvent(drop);
+        """, source_element, target_element)
